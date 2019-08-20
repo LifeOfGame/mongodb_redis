@@ -13,18 +13,11 @@ class DataBaseManager(object):
     def query_info(self):
         """
         你需要在这里实现这个方法,
-        查询集合people_info并返回所有"deleted"字段为0的数据。
+        查询集合people_info并返回所有"deleted"字段为0的数据
         注意返回的信息需要去掉_id
         """
         info_list = list(self.handler.find({'deleted': 0}, {'_id': 0}))
         return info_list
-        # return [
-        #     {'id': 1, 'name': '测试数据', 'age': 18, 'birthday': '2000-01-02',
-        #      'origin_home': '测试数据', 'current_home': '测试数据'},
-        #     {'id': 2, 'name': '测试数据', 'age': 18, 'birthday': '2000-01-02',
-        #      'origin_home': '测试数据', 'current_home': '测试数据'},
-        #     {'id': 3, 'name': '测试数据', 'age': 18, 'birthday': '2000-01-02',
-        #      'origin_home': '测试数据', 'current_home': '测试数据'}]
 
     def _query_last_id(self):
         """
@@ -37,7 +30,6 @@ class DataBaseManager(object):
         """
         last_info = self.handler.find({}, {'_id': 0, 'id': 1}).sort('id', -1).limit(1)
         return last_info[0]['id'] if last_info else 0
-        # return 0
 
     def add_info(self, para_dict):
         """
@@ -58,7 +50,7 @@ class DataBaseManager(object):
         try:
             self.handler.insert_one(para_dict)
         except Exception as e:
-            print('插入数据失败， 保存信息如下：{}'.format(e))
+            print('插入数据失败，保存信息如下：{}'.format(e))
             return False
         return True
 
@@ -71,7 +63,12 @@ class DataBaseManager(object):
         :param para_dict: 格式为{'name': 'xxx', 'age': 12, 'birthday': '2000-01-01', 'origin_home': 'xxx', 'current_home': 'yyy'}
         :return: True或者False
         """
-
+        try:
+            y = self.handler.update_one({'id': people_id}, {'$set': para_dict})
+            print(y)
+        except Exception as e:
+            print('更新数据错误，报错信息如下：{}'.format(e))
+            return False
         return True
 
     def del_info(self, people_id):
@@ -81,7 +78,7 @@ class DataBaseManager(object):
         :param people_id: 人员id
         :return: True或者False
         """
-        return True
+        return self.update_info(people_id, {'deleted': 1})
 
 
 if __name__ == '__main__':
